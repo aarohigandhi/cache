@@ -20,36 +20,64 @@ export function ScreenshotCard({
   onClick,
   onDelete,
   deleting,
+  selectMode = false,
+  selected = false,
+  onToggleSelect,
 }: {
   screenshot: Screenshot;
   onClick: () => void;
   onDelete: () => void;
   deleting: boolean;
+  selectMode?: boolean;
+  selected?: boolean;
+  onToggleSelect?: () => void;
 }) {
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
   const colors = CATEGORY_COLORS[normalizeCategory(category)];
 
+  function handleCardClick() {
+    if (selectMode) {
+      onToggleSelect?.();
+    } else {
+      onClick();
+    }
+  }
+
   return (
-    <div className="relative cursor-pointer" onClick={onClick}>
+    <div className="relative cursor-pointer" onClick={handleCardClick}>
       <img
         src={file_url}
         alt={file_name}
-        className="aspect-square w-full rounded-lg object-cover"
+        className={`aspect-square w-full rounded-lg object-cover ${
+          selectMode && selected ? "ring-2 ring-black ring-offset-2" : ""
+        }`}
       />
 
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        disabled={deleting}
-        className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white disabled:opacity-50"
-        aria-label="Remove screenshot"
-      >
-        ×
-      </button>
+      {selectMode ? (
+        <div
+          className={`absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white ${
+            selected ? "bg-black" : "bg-black/40"
+          }`}
+        >
+          {selected && (
+            <div className="h-2.5 w-2.5 rounded-full bg-white" />
+          )}
+        </div>
+      ) : (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+          disabled={deleting}
+          className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white disabled:opacity-50"
+          aria-label="Remove screenshot"
+        >
+          ×
+        </button>
+      )}
 
       <div className="mt-1 flex flex-wrap items-center gap-1">
         {status === "failed" ? (

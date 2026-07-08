@@ -121,6 +121,35 @@ export default function Home() {
     setSelectedAlbumId(id);
   }
 
+  async function createAlbum(name: string): Promise<string> {
+    const res = await fetch("/api/albums", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    const album = await res.json();
+    await loadAlbums();
+    return album.id;
+  }
+
+  async function moveToAlbum(screenshotId: string, albumId: string | null) {
+    const res = await fetch(`/api/screenshots/${screenshotId}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ albumId }),
+    });
+    const updated = await res.json();
+    setScreenshots((prev) =>
+      prev.map((s) => (s.id === screenshotId ? updated : s))
+    );
+    setSearchResults(
+      (prev) =>
+        prev && prev.map((s) => (s.id === screenshotId ? updated : s))
+    );
+    setSelected((prev) => (prev?.id === screenshotId ? updated : prev));
+    await loadAlbums();
+  }
+
   const ungroupedScreenshots = screenshots.filter((s) => !s.album_id);
   const albumScreenshots = selectedAlbumId
     ? screenshots.filter((s) => s.album_id === selectedAlbumId)
@@ -233,7 +262,10 @@ export default function Home() {
       {selected && (
         <ScreenshotDetailModal
           screenshot={selected}
+          albums={albums}
           onClose={() => setSelected(null)}
+          onMove={(albumId) => moveToAlbum(selected.id, albumId)}
+          onCreateAlbum={createAlbum}
         />
       )}
     </main>

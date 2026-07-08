@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ChangeEvent } from "react";
 import type { Screenshot } from "./ScreenshotCard";
 import type { Album } from "./AlbumCard";
-import { CATEGORY_COLORS, NEUTRAL_CHIP_COLOR, normalizeCategory } from "@/lib/categories";
+import { CATEGORY_COLORS, colorForTag, normalizeCategory } from "@/lib/categories";
 
 const NO_ALBUM_VALUE = "__none__";
 const NEW_ALBUM_VALUE = "__new__";
@@ -22,7 +22,8 @@ export function ScreenshotDetailModal({
   onCreateAlbum: (name: string) => Promise<string>;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
-  const categoryColors = CATEGORY_COLORS[normalizeCategory(screenshot.category)];
+  const normalizedCategory = normalizeCategory(screenshot.category);
+  const categoryColors = CATEGORY_COLORS[normalizedCategory];
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -76,7 +77,7 @@ export function ScreenshotDetailModal({
           </p>
         )}
 
-        {screenshot.category && (
+        {normalizedCategory !== "other" && (
           <span
             className="mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
             style={{
@@ -84,7 +85,7 @@ export function ScreenshotDetailModal({
               color: categoryColors.text,
             }}
           >
-            {normalizeCategory(screenshot.category)}
+            {normalizedCategory}
           </span>
         )}
 
@@ -94,18 +95,18 @@ export function ScreenshotDetailModal({
 
         {screenshot.tags && screenshot.tags.length > 0 && (
           <div className="mb-3 flex flex-wrap gap-1">
-            {screenshot.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full px-2 py-0.5 text-xs"
-                style={{
-                  backgroundColor: NEUTRAL_CHIP_COLOR.bg,
-                  color: NEUTRAL_CHIP_COLOR.text,
-                }}
-              >
-                {tag}
-              </span>
-            ))}
+            {screenshot.tags.map((tag) => {
+              const colors = colorForTag(tag);
+              return (
+                <span
+                  key={tag}
+                  className="rounded-full px-2 py-0.5 text-xs"
+                  style={{ backgroundColor: colors.bg, color: colors.text }}
+                >
+                  {tag}
+                </span>
+              );
+            })}
           </div>
         )}
 

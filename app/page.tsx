@@ -468,6 +468,7 @@ export default function Home() {
                       count={albumShots.length}
                       categories={albumCategories}
                       onClick={() => openAlbum(album.id)}
+                      onRename={() => handleRenameAlbum(album.id)}
                     />
                   );
                 })}

@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORY_COLORS, NEUTRAL_CHIP_COLOR, normalizeCategory } from "@/lib/categories";
+import { CATEGORY_COLORS, colorForTag, normalizeCategory } from "@/lib/categories";
 
 export type Screenshot = {
   id: string;
@@ -35,15 +35,8 @@ export function ScreenshotCard({
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
-  const categoryColors = CATEGORY_COLORS[normalizeCategory(category)];
-  const categoryChipStyle = {
-    backgroundColor: categoryColors.bg,
-    color: categoryColors.text,
-  };
-  const tagChipStyle = {
-    backgroundColor: NEUTRAL_CHIP_COLOR.bg,
-    color: NEUTRAL_CHIP_COLOR.text,
-  };
+  const normalizedCategory = normalizeCategory(category);
+  const categoryColors = CATEGORY_COLORS[normalizedCategory];
 
   function handleCardClick() {
     if (selectMode) {
@@ -96,26 +89,29 @@ export function ScreenshotCard({
           <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
             processing...
           </span>
-        ) : category ? (
+        ) : normalizedCategory !== "other" ? (
           <span
             className="rounded-full px-2 py-0.5 text-xs font-medium"
-            style={categoryChipStyle}
+            style={{ backgroundColor: categoryColors.bg, color: categoryColors.text }}
           >
-            {normalizeCategory(category)}
+            {normalizedCategory}
           </span>
         ) : null}
 
-        {visibleTags.map((tag) => (
-          <span
-            key={tag}
-            className="rounded-full px-2 py-0.5 text-xs"
-            style={tagChipStyle}
-          >
-            {tag}
-          </span>
-        ))}
+        {visibleTags.map((tag) => {
+          const colors = colorForTag(tag);
+          return (
+            <span
+              key={tag}
+              className="rounded-full px-2 py-0.5 text-xs"
+              style={{ backgroundColor: colors.bg, color: colors.text }}
+            >
+              {tag}
+            </span>
+          );
+        })}
         {overflowCount > 0 && (
-          <span className="rounded-full px-2 py-0.5 text-xs" style={tagChipStyle}>
+          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
             +{overflowCount}
           </span>
         )}

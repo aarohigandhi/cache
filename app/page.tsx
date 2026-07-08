@@ -48,25 +48,6 @@ export default function Home() {
     }
     const fileArray = Array.from(files);
 
-    let albumId: string | null = null;
-    if (fileArray.length > 1) {
-      const defaultName = `Album ${new Date().toLocaleDateString()}`;
-      const name = window.prompt(
-        `Name this album of ${fileArray.length} screenshots:`,
-        defaultName
-      );
-      if (name === null) {
-        return;
-      }
-      const res = await fetch("/api/albums", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: name || defaultName }),
-      });
-      const album = await res.json();
-      albumId = album.id;
-    }
-
     setUploading(true);
     setUploadProgress({ done: 0, total: fileArray.length });
 
@@ -74,17 +55,17 @@ export default function Home() {
       fileArray.map(async (file) => {
         const formData = new FormData();
         formData.append("file", file);
-        if (albumId) {
-          formData.append("albumId", albumId);
-        }
         await fetch("/api/upload", { method: "POST", body: formData });
         setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
         await loadScreenshots();
       })
     );
 
-    await loadAlbums();
     setUploading(false);
+
+    if (fileArray.length > 1) {
+      await handleAutoSort();
+    }
   }
 
   async function handleDelete(id: string) {
@@ -183,7 +164,7 @@ export default function Home() {
         </button>
         <button
           onClick={handleAutoSort}
-          disabled={sorting || ungroupedScreenshots.length === 0}
+          disabled={sorting}
           className="rounded-lg border border-black px-6 py-3 text-black disabled:opacity-50"
         >
           {sorting ? "Sorting..." : "Sort into albums"}
@@ -262,18 +243,22 @@ export default function Home() {
             </>
           )}
 
-          <h2 className="mb-4 text-lg font-semibold">All screenshots</h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-            {ungroupedScreenshots.map((s) => (
-              <ScreenshotCard
-                key={s.id}
-                screenshot={s}
-                onClick={() => setSelected(s)}
-                onDelete={() => handleDelete(s.id)}
-                deleting={deletingIds.has(s.id)}
-              />
-            ))}
-          </div>
+          {ungroupedScreenshots.length > 0 && (
+            <>
+              <h2 className="mb-4 text-lg font-semibold">All screenshots</h2>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+                {ungroupedScreenshots.map((s) => (
+                  <ScreenshotCard
+                    key={s.id}
+                    screenshot={s}
+                    onClick={() => setSelected(s)}
+                    onDelete={() => handleDelete(s.id)}
+                    deleting={deletingIds.has(s.id)}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </>
       )}
 

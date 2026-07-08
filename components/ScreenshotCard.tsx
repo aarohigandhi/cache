@@ -10,6 +10,7 @@ export type Screenshot = {
   tags: string[] | null;
   description: string | null;
   status: string | null;
+  album_id: string | null;
 };
 
 const CATEGORY_COLORS: Record<string, string> = {

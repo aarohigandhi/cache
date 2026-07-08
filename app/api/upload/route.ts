@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
+import { analyzeScreenshot } from "@/lib/vision";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -32,5 +33,22 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: dbError.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  try {
+    const analysis = await analyzeScreenshot(urlData.publicUrl);
+    const { data: updated, error: updateError } = await supabase
+      .from("screenshots")
+      .update(analysis)
+      .eq("id", data.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw updateError;
+    }
+
+    return NextResponse.json(updated);
+  } catch (err) {
+    console.error("vision analysis failed", err);
+    return NextResponse.json(data);
+  }
 }

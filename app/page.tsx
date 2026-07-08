@@ -2,19 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
-
-type Screenshot = {
-  id: string;
-  file_url: string;
-  file_name: string;
-  created_at: string;
-};
+import { ScreenshotCard, type Screenshot } from "@/components/ScreenshotCard";
+import { ScreenshotDetailModal } from "@/components/ScreenshotDetailModal";
 
 export default function Home() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
+  const [selected, setSelected] = useState<Screenshot | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -45,10 +41,10 @@ export default function Home() {
         formData.append("file", file);
         await fetch("/api/upload", { method: "POST", body: formData });
         setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
+        await loadScreenshots();
       })
     );
 
-    await loadScreenshots();
     setUploading(false);
   }
 
@@ -57,6 +53,7 @@ export default function Home() {
     const res = await fetch(`/api/screenshots/${id}`, { method: "DELETE" });
     if (res.ok) {
       setScreenshots((prev) => prev.filter((s) => s.id !== id));
+      setSelected((prev) => (prev?.id === id ? null : prev));
     }
     setDeletingIds((prev) => {
       const next = new Set(prev);
@@ -74,7 +71,7 @@ export default function Home() {
         className="mb-8 rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
       >
         {uploading
-          ? `Uploading ${uploadProgress.done}/${uploadProgress.total}...`
+          ? `Processing ${uploadProgress.done}/${uploadProgress.total}...`
           : "Upload screenshots"}
       </button>
       <input
@@ -87,23 +84,21 @@ export default function Home() {
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {screenshots.map((s) => (
-          <div key={s.id} className="relative">
-            <img
-              src={s.file_url}
-              alt={s.file_name}
-              className="w-full rounded-lg object-cover"
-            />
-            <button
-              onClick={() => handleDelete(s.id)}
-              disabled={deletingIds.has(s.id)}
-              className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white disabled:opacity-50"
-              aria-label="Remove screenshot"
-            >
-              ×
-            </button>
-          </div>
+          <ScreenshotCard
+            key={s.id}
+            screenshot={s}
+            onClick={() => setSelected(s)}
+            onDelete={() => handleDelete(s.id)}
+            deleting={deletingIds.has(s.id)}
+          />
         ))}
       </div>
+      {selected && (
+        <ScreenshotDetailModal
+          screenshot={selected}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </main>
   );
 }

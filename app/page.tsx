@@ -64,7 +64,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">Stash</h1>
+      <h1 className="mb-6 text-3xl font-bold">Cache</h1>
       <button
         onClick={() => fileInputRef.current?.click()}
         disabled={uploading}

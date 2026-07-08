@@ -1,0 +1,90 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import type { Screenshot } from "./ScreenshotCard";
+
+export function ScreenshotDetailModal({
+  screenshot,
+  onClose,
+}: {
+  screenshot: Screenshot;
+  onClose: () => void;
+}) {
+  const overlayRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onClose]);
+
+  return (
+    <div
+      ref={overlayRef}
+      onClick={(e) => {
+        if (e.target === overlayRef.current) onClose();
+      }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+    >
+      <div className="max-h-full w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-4">
+        <div className="mb-3 flex justify-end">
+          <button
+            onClick={onClose}
+            className="text-xl leading-none text-gray-500 hover:text-black"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+
+        <img
+          src={screenshot.file_url}
+          alt={screenshot.file_name}
+          className="mb-4 w-full rounded-lg object-contain"
+        />
+
+        {screenshot.status === "failed" && (
+          <p className="mb-2 inline-block rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-800">
+            failed to process
+          </p>
+        )}
+
+        {screenshot.category && (
+          <p className="mb-2 text-sm font-medium tracking-wide text-gray-500 uppercase">
+            {screenshot.category}
+          </p>
+        )}
+
+        {screenshot.description && (
+          <p className="mb-3 text-base">{screenshot.description}</p>
+        )}
+
+        {screenshot.tags && screenshot.tags.length > 0 && (
+          <div className="mb-3 flex flex-wrap gap-1">
+            {screenshot.tags.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {screenshot.extracted_text && (
+          <div className="mt-3 border-t pt-3">
+            <p className="mb-1 text-xs font-medium tracking-wide text-gray-400 uppercase">
+              Extracted text
+            </p>
+            <p className="text-sm whitespace-pre-wrap text-gray-700">
+              {screenshot.extracted_text}
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}

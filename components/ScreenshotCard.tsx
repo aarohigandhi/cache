@@ -1,5 +1,7 @@
 "use client";
 
+import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
+
 export type Screenshot = {
   id: string;
   file_url: string;
@@ -11,18 +13,6 @@ export type Screenshot = {
   description: string | null;
   status: string | null;
   album_id: string | null;
-};
-
-export const CATEGORY_COLORS: Record<string, string> = {
-  recipe: "bg-orange-100 text-orange-800",
-  outfit: "bg-pink-100 text-pink-800",
-  travel: "bg-blue-100 text-blue-800",
-  quote: "bg-purple-100 text-purple-800",
-  listing: "bg-green-100 text-green-800",
-  meme: "bg-yellow-100 text-yellow-800",
-  social: "bg-indigo-100 text-indigo-800",
-  receipt: "bg-teal-100 text-teal-800",
-  other: "bg-gray-100 text-gray-800",
 };
 
 export function ScreenshotCard({
@@ -72,10 +62,10 @@ export function ScreenshotCard({
         ) : category ? (
           <span
             className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-              CATEGORY_COLORS[category] ?? CATEGORY_COLORS.other
+              CATEGORY_COLORS[normalizeCategory(category)]
             }`}
           >
-            {category}
+            {normalizeCategory(category)}
           </span>
         ) : null}
 

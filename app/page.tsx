@@ -7,6 +7,7 @@ import { ScreenshotDetailModal } from "@/components/ScreenshotDetailModal";
 import { AlbumCard, type Album } from "@/components/AlbumCard";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
+import { normalizeCategory } from "@/lib/categories";
 
 export default function Home() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
@@ -159,7 +160,15 @@ export default function Home() {
   }
 
   const byCategory = (list: Screenshot[]) =>
-    selectedCategory ? list.filter((s) => s.category === selectedCategory) : list;
+    selectedCategory
+      ? list.filter((s) => normalizeCategory(s.category) === selectedCategory)
+      : list;
+
+  // A category filter searches the whole library, not just the ungrouped
+  // screenshots, since most screenshots may live inside albums.
+  const categoryResults = selectedCategory
+    ? byCategory(screenshots)
+    : null;
 
   const ungroupedScreenshots = byCategory(
     screenshots.filter((s) => !s.album_id)
@@ -228,6 +237,23 @@ export default function Home() {
           </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
             {albumScreenshots.map((s) => (
+              <ScreenshotCard
+                key={s.id}
+                screenshot={s}
+                onClick={() => setSelected(s)}
+                onDelete={() => handleDelete(s.id)}
+                deleting={deletingIds.has(s.id)}
+              />
+            ))}
+          </div>
+        </>
+      ) : categoryResults !== null ? (
+        <>
+          <h2 className="mb-4 text-lg font-semibold capitalize">
+            {selectedCategory} ({categoryResults.length})
+          </h2>
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+            {categoryResults.map((s) => (
               <ScreenshotCard
                 key={s.id}
                 screenshot={s}

@@ -1,16 +1,4 @@
-const CATEGORIES = [
-  "recipe",
-  "outfit",
-  "travel",
-  "quote",
-  "listing",
-  "meme",
-  "social",
-  "receipt",
-  "other",
-] as const;
-
-export type Category = (typeof CATEGORIES)[number];
+import { CATEGORIES, normalizeCategory, type Category } from "./categories";
 
 export type VisionResult = {
   extracted_text: string;
@@ -62,7 +50,7 @@ export async function analyzeScreenshot(imageUrl: string): Promise<VisionResult>
 
   return {
     extracted_text: typeof parsed.extracted_text === "string" ? parsed.extracted_text : "",
-    category: CATEGORIES.includes(parsed.category) ? parsed.category : "other",
+    category: normalizeCategory(parsed.category),
     tags: Array.isArray(parsed.tags) ? parsed.tags : [],
     description: typeof parsed.description === "string" ? parsed.description : "",
   };

@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORY_COLORS } from "@/components/ScreenshotCard";
+import { CATEGORIES, CATEGORY_COLORS } from "@/lib/categories";
 
 export function CategoryFilter({
   selected,
@@ -9,7 +9,6 @@ export function CategoryFilter({
   selected: string | null;
   onSelect: (category: string | null) => void;
 }) {
-  const categories = Object.keys(CATEGORY_COLORS);
 
   return (
     <div className="mb-6 flex flex-wrap gap-2">
@@ -23,7 +22,7 @@ export function CategoryFilter({
       >
         All
       </button>
-      {categories.map((category) => (
+      {CATEGORIES.map((category) => (
         <button
           key={category}
           onClick={() => onSelect(category)}

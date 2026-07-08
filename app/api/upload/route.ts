@@ -43,7 +43,7 @@ export async function POST(request: Request) {
 
     const { data: updated, error: updateError } = await supabase
       .from("screenshots")
-      .update({ ...analysis, embedding })
+      .update({ ...analysis, embedding, status: "done" })
       .eq("id", data.id)
       .select()
       .single();
@@ -55,6 +55,12 @@ export async function POST(request: Request) {
     return NextResponse.json(updated);
   } catch (err) {
     console.error("vision/embedding analysis failed", err);
-    return NextResponse.json(data);
+    const { data: failed } = await supabase
+      .from("screenshots")
+      .update({ status: "failed" })
+      .eq("id", data.id)
+      .select()
+      .single();
+    return NextResponse.json(failed ?? data);
   }
 }

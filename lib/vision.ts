@@ -5,6 +5,8 @@ const CATEGORIES = [
   "quote",
   "listing",
   "meme",
+  "social",
+  "receipt",
   "other",
 ] as const;
 
@@ -49,7 +51,14 @@ export async function analyzeScreenshot(imageUrl: string): Promise<VisionResult>
   }
 
   const data = await response.json();
-  const parsed = JSON.parse(data.choices[0].message.content);
+  const rawContent = data.choices[0].message.content;
+
+  let parsed;
+  try {
+    parsed = JSON.parse(rawContent);
+  } catch {
+    throw new Error(`vision response was not valid JSON: ${rawContent}`);
+  }
 
   return {
     extracted_text: typeof parsed.extracted_text === "string" ? parsed.extracted_text : "",

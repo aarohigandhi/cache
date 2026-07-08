@@ -1,14 +1,24 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ChangeEvent } from "react";
 import type { Screenshot } from "./ScreenshotCard";
+import type { Album } from "./AlbumCard";
+
+const NO_ALBUM_VALUE = "__none__";
+const NEW_ALBUM_VALUE = "__new__";
 
 export function ScreenshotDetailModal({
   screenshot,
+  albums,
   onClose,
+  onMove,
+  onCreateAlbum,
 }: {
   screenshot: Screenshot;
+  albums: Album[];
   onClose: () => void;
+  onMove: (albumId: string | null) => void;
+  onCreateAlbum: (name: string) => Promise<string>;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
 
@@ -19,6 +29,19 @@ export function ScreenshotDetailModal({
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [onClose]);
+
+  async function handleAlbumChange(e: ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value;
+    if (value === NEW_ALBUM_VALUE) {
+      const name = window.prompt("New album name:");
+      if (name) {
+        const newAlbumId = await onCreateAlbum(name);
+        onMove(newAlbumId);
+      }
+      return;
+    }
+    onMove(value === NO_ALBUM_VALUE ? null : value);
+  }
 
   return (
     <div
@@ -84,6 +107,25 @@ export function ScreenshotDetailModal({
             </p>
           </div>
         )}
+
+        <div className="mt-3 border-t pt-3">
+          <label className="mb-1 block text-xs font-medium tracking-wide text-gray-400 uppercase">
+            Album
+          </label>
+          <select
+            value={screenshot.album_id ?? NO_ALBUM_VALUE}
+            onChange={handleAlbumChange}
+            className="w-full rounded-lg border px-3 py-2 text-sm"
+          >
+            <option value={NO_ALBUM_VALUE}>No album</option>
+            {albums.map((album) => (
+              <option key={album.id} value={album.id}>
+                {album.name}
+              </option>
+            ))}
+            <option value={NEW_ALBUM_VALUE}>+ New album...</option>
+          </select>
+        </div>
       </div>
     </div>
   );

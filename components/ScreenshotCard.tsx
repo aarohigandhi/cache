@@ -36,6 +36,7 @@ export function ScreenshotCard({
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
   const colors = CATEGORY_COLORS[normalizeCategory(category)];
+  const chipStyle = { backgroundColor: colors.bg, color: colors.text };
 
   function handleCardClick() {
     if (selectMode) {
@@ -89,7 +90,10 @@ export function ScreenshotCard({
             processing...
           </span>
         ) : category ? (
-          <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${colors}`}>
+          <span
+            className="rounded-full px-2 py-0.5 text-xs font-medium"
+            style={chipStyle}
+          >
             {normalizeCategory(category)}
           </span>
         ) : null}
@@ -97,13 +101,14 @@ export function ScreenshotCard({
         {visibleTags.map((tag) => (
           <span
             key={tag}
-            className={`rounded-full px-2 py-0.5 text-xs ${colors}`}
+            className="rounded-full px-2 py-0.5 text-xs"
+            style={chipStyle}
           >
             {tag}
           </span>
         ))}
         {overflowCount > 0 && (
-          <span className={`rounded-full px-2 py-0.5 text-xs ${colors}`}>
+          <span className="rounded-full px-2 py-0.5 text-xs" style={chipStyle}>
             +{overflowCount}
           </span>
         )}

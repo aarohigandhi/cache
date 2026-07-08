@@ -8,14 +8,14 @@ import { AlbumCard, type Album } from "@/components/AlbumCard";
 import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { BulkActionBar } from "@/components/BulkActionBar";
-import { normalizeCategory } from "@/lib/categories";
+import { normalizeCategory, getTopTags } from "@/lib/categories";
 
 export default function Home() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<Screenshot[] | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -91,7 +91,7 @@ export default function Home() {
 
   async function handleSearch(query: string) {
     setSelectedAlbumId(null);
-    setSelectedCategory(null);
+    setSelectedTag(null);
     const res = await fetch("/api/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -110,9 +110,9 @@ export default function Home() {
     setSelectedAlbumId(id);
   }
 
-  function handleSelectCategory(category: string | null) {
+  function handleSelectTag(tag: string | null) {
     setSearchResults(null);
-    setSelectedCategory(category);
+    setSelectedTag(tag);
   }
 
   async function createAlbum(name: string): Promise<string> {
@@ -199,6 +199,9 @@ export default function Home() {
 
   async function handleSortButtonClick() {
     if (!flatView && albums.length > 0) {
+      setSelectedAlbumId(null);
+      setSelectedTag(null);
+      setSearchResults(null);
       setFlatView(true);
       return;
     }
@@ -268,22 +271,20 @@ export default function Home() {
     setSelectMode(false);
   }
 
-  const byCategory = (list: Screenshot[]) =>
-    selectedCategory
-      ? list.filter((s) => normalizeCategory(s.category) === selectedCategory)
+  const topTags = getTopTags(screenshots);
+
+  const byTag = (list: Screenshot[]) =>
+    selectedTag
+      ? list.filter((s) => s.tags?.some((t) => t.toLowerCase() === selectedTag))
       : list;
 
-  // A category filter searches the whole library, not just the ungrouped
+  // A tag filter searches the whole library, not just the ungrouped
   // screenshots, since most screenshots may live inside albums.
-  const categoryResults = selectedCategory
-    ? byCategory(screenshots)
-    : null;
+  const tagResults = selectedTag ? byTag(screenshots) : null;
 
-  const ungroupedScreenshots = byCategory(
-    screenshots.filter((s) => !s.album_id)
-  );
+  const ungroupedScreenshots = byTag(screenshots.filter((s) => !s.album_id));
   const albumScreenshots = selectedAlbumId
-    ? byCategory(screenshots.filter((s) => s.album_id === selectedAlbumId))
+    ? byTag(screenshots.filter((s) => s.album_id === selectedAlbumId))
     : [];
   const selectedAlbum = albums.find((a) => a.id === selectedAlbumId) ?? null;
 
@@ -346,8 +347,9 @@ export default function Home() {
       />
 
       <CategoryFilter
-        selected={selectedCategory}
-        onSelect={handleSelectCategory}
+        options={topTags}
+        selected={selectedTag}
+        onSelect={handleSelectTag}
       />
 
       {selectMode && selectedIds.size > 0 && (
@@ -380,64 +382,66 @@ export default function Home() {
             <h2 className="text-lg font-semibold">
               {selectedAlbum?.name ?? "Album"}
             </h2>
-            <div className="flex items-center gap-3">
-              <select
-                onChange={async (e) => {
-                  const targetId = e.target.value;
-                  if (!targetId || !selectedAlbumId) return;
-                  const target = albums.find((a) => a.id === targetId);
-                  if (
-                    window.confirm(
-                      `Merge "${selectedAlbum?.name}" into "${target?.name}"? This album will be removed.`
-                    )
-                  ) {
-                    await handleMergeAlbum(selectedAlbumId, targetId);
-                  }
-                  e.target.value = "";
-                }}
-                defaultValue=""
-                className="rounded-lg border px-2 py-1 text-sm text-gray-500"
-              >
-                <option value="" disabled>
-                  Merge into...
-                </option>
-                {albums
-                  .filter((a) => a.id !== selectedAlbumId)
-                  .map((a) => (
-                    <option key={a.id} value={a.id}>
-                      {a.name}
-                    </option>
-                  ))}
-              </select>
-              <button
-                onClick={() => selectedAlbumId && handleRenameAlbum(selectedAlbumId)}
-                className="text-sm text-gray-500 hover:text-black"
-              >
-                Rename
-              </button>
-              <button
-                onClick={() => selectedAlbumId && handleDeleteAlbum(selectedAlbumId)}
-                className="text-sm text-red-500 hover:text-red-700"
-              >
-                Delete album
-              </button>
-            </div>
+            {!selectMode && (
+              <div className="flex items-center gap-3">
+                <select
+                  onChange={async (e) => {
+                    const targetId = e.target.value;
+                    if (!targetId || !selectedAlbumId) return;
+                    const target = albums.find((a) => a.id === targetId);
+                    if (
+                      window.confirm(
+                        `Merge "${selectedAlbum?.name}" into "${target?.name}"? This album will be removed.`
+                      )
+                    ) {
+                      await handleMergeAlbum(selectedAlbumId, targetId);
+                    }
+                    e.target.value = "";
+                  }}
+                  defaultValue=""
+                  className="rounded-lg border px-2 py-1 text-sm text-gray-500"
+                >
+                  <option value="" disabled>
+                    Merge into...
+                  </option>
+                  {albums
+                    .filter((a) => a.id !== selectedAlbumId)
+                    .map((a) => (
+                      <option key={a.id} value={a.id}>
+                        {a.name}
+                      </option>
+                    ))}
+                </select>
+                <button
+                  onClick={() => selectedAlbumId && handleRenameAlbum(selectedAlbumId)}
+                  className="text-sm text-gray-500 hover:text-black"
+                >
+                  Rename
+                </button>
+                <button
+                  onClick={() => selectedAlbumId && handleDeleteAlbum(selectedAlbumId)}
+                  className="text-sm text-red-500 hover:text-red-700"
+                >
+                  Delete album
+                </button>
+              </div>
+            )}
           </div>
           {renderGrid(albumScreenshots)}
         </>
-      ) : categoryResults !== null ? (
+      ) : tagResults !== null ? (
         <>
           <h2 className="mb-4 text-lg font-semibold capitalize">
-            {selectedCategory} ({categoryResults.length})
+            {selectedTag} ({tagResults.length})
           </h2>
-          {renderGrid(categoryResults)}
+          {renderGrid(tagResults)}
         </>
       ) : flatView ? (
         <>
           <h2 className="mb-4 text-lg font-semibold">
-            All screenshots ({byCategory(screenshots).length})
+            All screenshots ({byTag(screenshots).length})
           </h2>
-          {renderGrid(byCategory(screenshots))}
+          {renderGrid(byTag(screenshots))}
         </>
       ) : (
         <>

@@ -47,9 +47,11 @@ export function AlbumCard({
             {categories.map((category) => (
               <span
                 key={category}
-                className={`rounded-full px-2 py-0.5 text-[10px] font-medium capitalize ${
-                  CATEGORY_COLORS[normalizeCategory(category)]
-                }`}
+                className="rounded-full px-2 py-0.5 text-[10px] font-medium capitalize"
+                style={{
+                  backgroundColor: CATEGORY_COLORS[normalizeCategory(category)].bg,
+                  color: CATEGORY_COLORS[normalizeCategory(category)].text,
+                }}
               >
                 {category}
               </span>

@@ -77,9 +77,11 @@ export function ScreenshotDetailModal({
 
         {screenshot.category && (
           <span
-            className={`mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
-              CATEGORY_COLORS[normalizeCategory(screenshot.category)]
-            }`}
+            className="mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
+            style={{
+              backgroundColor: CATEGORY_COLORS[normalizeCategory(screenshot.category)].bg,
+              color: CATEGORY_COLORS[normalizeCategory(screenshot.category)].text,
+            }}
           >
             {normalizeCategory(screenshot.category)}
           </span>
@@ -94,9 +96,11 @@ export function ScreenshotDetailModal({
             {screenshot.tags.map((tag) => (
               <span
                 key={tag}
-                className={`rounded-full px-2 py-0.5 text-xs ${
-                  CATEGORY_COLORS[normalizeCategory(screenshot.category)]
-                }`}
+                className="rounded-full px-2 py-0.5 text-xs"
+                style={{
+                  backgroundColor: CATEGORY_COLORS[normalizeCategory(screenshot.category)].bg,
+                  color: CATEGORY_COLORS[normalizeCategory(screenshot.category)].text,
+                }}
               >
                 {tag}
               </span>

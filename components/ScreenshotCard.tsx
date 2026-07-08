@@ -13,7 +13,7 @@ export type Screenshot = {
   album_id: string | null;
 };
 
-const CATEGORY_COLORS: Record<string, string> = {
+export const CATEGORY_COLORS: Record<string, string> = {
   recipe: "bg-orange-100 text-orange-800",
   outfit: "bg-pink-100 text-pink-800",
   travel: "bg-blue-100 text-blue-800",

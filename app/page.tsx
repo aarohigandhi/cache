@@ -6,12 +6,14 @@ import { ScreenshotCard, type Screenshot } from "@/components/ScreenshotCard";
 import { ScreenshotDetailModal } from "@/components/ScreenshotDetailModal";
 import { AlbumCard, type Album } from "@/components/AlbumCard";
 import { SearchBar } from "@/components/SearchBar";
+import { CategoryFilter } from "@/components/CategoryFilter";
 
 export default function Home() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [albums, setAlbums] = useState<Album[]>([]);
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<Screenshot[] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
   const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
@@ -103,6 +105,7 @@ export default function Home() {
 
   async function handleSearch(query: string) {
     setSelectedAlbumId(null);
+    setSelectedCategory(null);
     const res = await fetch("/api/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -119,6 +122,11 @@ export default function Home() {
   function openAlbum(id: string) {
     setSearchResults(null);
     setSelectedAlbumId(id);
+  }
+
+  function handleSelectCategory(category: string | null) {
+    setSearchResults(null);
+    setSelectedCategory(category);
   }
 
   async function createAlbum(name: string): Promise<string> {
@@ -150,9 +158,14 @@ export default function Home() {
     await loadAlbums();
   }
 
-  const ungroupedScreenshots = screenshots.filter((s) => !s.album_id);
+  const byCategory = (list: Screenshot[]) =>
+    selectedCategory ? list.filter((s) => s.category === selectedCategory) : list;
+
+  const ungroupedScreenshots = byCategory(
+    screenshots.filter((s) => !s.album_id)
+  );
   const albumScreenshots = selectedAlbumId
-    ? screenshots.filter((s) => s.album_id === selectedAlbumId)
+    ? byCategory(screenshots.filter((s) => s.album_id === selectedAlbumId))
     : [];
   const selectedAlbum = albums.find((a) => a.id === selectedAlbumId) ?? null;
 
@@ -178,6 +191,11 @@ export default function Home() {
         multiple
         hidden
         onChange={(e) => handleFiles(e.target.files)}
+      />
+
+      <CategoryFilter
+        selected={selectedCategory}
+        onSelect={handleSelectCategory}
       />
 
       {searchResults !== null ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
+import { CATEGORY_COLORS, NEUTRAL_CHIP_COLOR, normalizeCategory } from "@/lib/categories";
 
 export type Screenshot = {
   id: string;
@@ -35,8 +35,15 @@ export function ScreenshotCard({
   const { file_url, file_name, category, tags, status } = screenshot;
   const visibleTags = tags?.slice(0, 3) ?? [];
   const overflowCount = (tags?.length ?? 0) - visibleTags.length;
-  const colors = CATEGORY_COLORS[normalizeCategory(category)];
-  const chipStyle = { backgroundColor: colors.bg, color: colors.text };
+  const categoryColors = CATEGORY_COLORS[normalizeCategory(category)];
+  const categoryChipStyle = {
+    backgroundColor: categoryColors.bg,
+    color: categoryColors.text,
+  };
+  const tagChipStyle = {
+    backgroundColor: NEUTRAL_CHIP_COLOR.bg,
+    color: NEUTRAL_CHIP_COLOR.text,
+  };
 
   function handleCardClick() {
     if (selectMode) {
@@ -92,7 +99,7 @@ export function ScreenshotCard({
         ) : category ? (
           <span
             className="rounded-full px-2 py-0.5 text-xs font-medium"
-            style={chipStyle}
+            style={categoryChipStyle}
           >
             {normalizeCategory(category)}
           </span>
@@ -102,13 +109,13 @@ export function ScreenshotCard({
           <span
             key={tag}
             className="rounded-full px-2 py-0.5 text-xs"
-            style={chipStyle}
+            style={tagChipStyle}
           >
             {tag}
           </span>
         ))}
         {overflowCount > 0 && (
-          <span className="rounded-full px-2 py-0.5 text-xs" style={chipStyle}>
+          <span className="rounded-full px-2 py-0.5 text-xs" style={tagChipStyle}>
             +{overflowCount}
           </span>
         )}

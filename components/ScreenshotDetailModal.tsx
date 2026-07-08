@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ChangeEvent } from "react";
 import type { Screenshot } from "./ScreenshotCard";
 import type { Album } from "./AlbumCard";
-import { CATEGORY_COLORS, normalizeCategory } from "@/lib/categories";
+import { CATEGORY_COLORS, NEUTRAL_CHIP_COLOR, normalizeCategory } from "@/lib/categories";
 
 const NO_ALBUM_VALUE = "__none__";
 const NEW_ALBUM_VALUE = "__new__";
@@ -22,6 +22,7 @@ export function ScreenshotDetailModal({
   onCreateAlbum: (name: string) => Promise<string>;
 }) {
   const overlayRef = useRef<HTMLDivElement>(null);
+  const categoryColors = CATEGORY_COLORS[normalizeCategory(screenshot.category)];
 
   useEffect(() => {
     function handleKey(e: KeyboardEvent) {
@@ -79,8 +80,8 @@ export function ScreenshotDetailModal({
           <span
             className="mb-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium"
             style={{
-              backgroundColor: CATEGORY_COLORS[normalizeCategory(screenshot.category)].bg,
-              color: CATEGORY_COLORS[normalizeCategory(screenshot.category)].text,
+              backgroundColor: categoryColors.bg,
+              color: categoryColors.text,
             }}
           >
             {normalizeCategory(screenshot.category)}
@@ -98,8 +99,8 @@ export function ScreenshotDetailModal({
                 key={tag}
                 className="rounded-full px-2 py-0.5 text-xs"
                 style={{
-                  backgroundColor: CATEGORY_COLORS[normalizeCategory(screenshot.category)].bg,
-                  color: CATEGORY_COLORS[normalizeCategory(screenshot.category)].text,
+                  backgroundColor: NEUTRAL_CHIP_COLOR.bg,
+                  color: NEUTRAL_CHIP_COLOR.text,
                 }}
               >
                 {tag}

@@ -31,6 +31,14 @@ export const CATEGORY_COLORS: Record<Category, CategoryColor> = {
   other: { bg: "rgba(229,231,235,0.3)", text: "#374151" },
 };
 
+// Plain, uncolored style for tags — only the single category badge on
+// a card gets a color; tags stay neutral so the whole card doesn't
+// read as one loud color.
+export const NEUTRAL_CHIP_COLOR: CategoryColor = {
+  bg: "rgba(148,163,184,0.15)",
+  text: "#94a3b8",
+};
+
 export function normalizeCategory(
   value: string | null | undefined
 ): Category {

@@ -19,6 +19,8 @@ type Screenshot = {
 export default function Home() {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
+  const [deletingIds, setDeletingIds] = useState<Set<string>>(new Set());
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function loadScreenshots() {
@@ -39,14 +41,34 @@ export default function Home() {
     if (!files || files.length === 0) {
       return;
     }
+    const fileArray = Array.from(files);
     setUploading(true);
-    for (const file of Array.from(files)) {
-      const formData = new FormData();
-      formData.append("file", file);
-      await fetch("/api/upload", { method: "POST", body: formData });
-    }
+    setUploadProgress({ done: 0, total: fileArray.length });
+
+    await Promise.all(
+      fileArray.map(async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        await fetch("/api/upload", { method: "POST", body: formData });
+        setUploadProgress((p) => ({ ...p, done: p.done + 1 }));
+      })
+    );
+
     await loadScreenshots();
     setUploading(false);
+  }
+
+  async function handleDelete(id: string) {
+    setDeletingIds((prev) => new Set(prev).add(id));
+    const res = await fetch(`/api/screenshots/${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setScreenshots((prev) => prev.filter((s) => s.id !== id));
+    }
+    setDeletingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   }
 
   return (
@@ -57,7 +79,9 @@ export default function Home() {
         disabled={uploading}
         className="mb-8 rounded-lg bg-black px-6 py-3 text-white disabled:opacity-50"
       >
-        {uploading ? "Uploading..." : "Upload screenshots"}
+        {uploading
+          ? `Uploading ${uploadProgress.done}/${uploadProgress.total}...`
+          : "Upload screenshots"}
       </button>
       <input
         ref={fileInputRef}
@@ -69,7 +93,25 @@ export default function Home() {
       />
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         {screenshots.map((s) => (
+<<<<<<< HEAD
           <ScreenshotCard key={s.id} screenshot={s} />
+=======
+          <div key={s.id} className="relative">
+            <img
+              src={s.file_url}
+              alt={s.file_name}
+              className="w-full rounded-lg object-cover"
+            />
+            <button
+              onClick={() => handleDelete(s.id)}
+              disabled={deletingIds.has(s.id)}
+              className="absolute top-2 right-2 flex h-7 w-7 items-center justify-center rounded-full bg-black/70 text-white disabled:opacity-50"
+              aria-label="Remove screenshot"
+            >
+              ×
+            </button>
+          </div>
+>>>>>>> main
         ))}
       </div>
     </main>

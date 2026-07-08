@@ -1,0 +1,10 @@
+[
+  {
+    "file_name": "example-recipe-screenshot.png",
+    "expected_category": "recipe"
+  },
+  {
+    "file_name": "example-outfit-screenshot.png",
+    "expected_category": "outfit"
+  }
+]

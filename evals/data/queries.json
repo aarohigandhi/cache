@@ -1,0 +1,10 @@
+[
+  {
+    "query": "pasta recipe under 30 minutes",
+    "expected_file_name": "example-recipe-screenshot.png"
+  },
+  {
+    "query": "that blue dress I saved",
+    "expected_file_name": "example-outfit-screenshot.png"
+  }
+]

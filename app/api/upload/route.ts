@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabase } from "@/lib/supabase";
 import { analyzeScreenshot } from "@/lib/vision";
+import { embedText } from "@/lib/embeddings";
 
 export async function POST(request: Request) {
   const formData = await request.formData();
@@ -35,9 +36,14 @@ export async function POST(request: Request) {
 
   try {
     const analysis = await analyzeScreenshot(urlData.publicUrl);
+    const embeddingInput = [analysis.description, analysis.extracted_text, analysis.tags.join(" ")]
+      .filter(Boolean)
+      .join("\n");
+    const embedding = await embedText(embeddingInput);
+
     const { data: updated, error: updateError } = await supabase
       .from("screenshots")
-      .update(analysis)
+      .update({ ...analysis, embedding })
       .eq("id", data.id)
       .select()
       .single();
@@ -48,7 +54,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(updated);
   } catch (err) {
-    console.error("vision analysis failed", err);
+    console.error("vision/embedding analysis failed", err);
     return NextResponse.json(data);
   }
 }

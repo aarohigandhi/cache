@@ -6,6 +6,7 @@ import { embedText } from "@/lib/embeddings";
 export async function POST(request: Request) {
   const formData = await request.formData();
   const file = formData.get("file") as File;
+  const albumId = formData.get("albumId") as string | null;
 
   if (!file) {
     return NextResponse.json({ error: "no file" }, { status: 400 });
@@ -26,7 +27,11 @@ export async function POST(request: Request) {
 
   const { data, error: dbError } = await supabase
     .from("screenshots")
-    .insert({ file_url: urlData.publicUrl, file_name: file.name })
+    .insert({
+      file_url: urlData.publicUrl,
+      file_name: file.name,
+      album_id: albumId || null,
+    })
     .select()
     .single();
 

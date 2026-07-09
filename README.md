@@ -65,4 +65,4 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Who built it
 
 - **Varnika Dokka** - the frontend: auth, onboarding, and the whole user search experience.
-- **Aarohi Gandhi** — the backend and the AI pipeline that reads, tags, and organizes every screenshot.
+- **Aarohi Gandhi** - the backend and the AI pipeline that reads, tags, and organizes every screenshot.

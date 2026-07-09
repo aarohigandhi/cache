@@ -1,36 +1,97 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cache
+
+**Stop scrolling. Start searching.**
+
+Cache is an AI-powered screenshot manager that transforms your camera roll into a searchable library. Instead of scrolling through hundreds of saved screenshots, Cache automatically extracts text, understands context, categorizes your content, and helps you find exactly what you're looking for using natural language.
+
+Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note, or an outfit inspiration post, Cache makes your screenshots easy to organize and even easier to find.
+
+---
+
+## Features
+
+- **Natural Language Search**
+  - Search using everyday language, such as:
+    - "Show me the pasta recipe I saved."
+    - "Find my Seattle itinerary."
+    - "Receipt from Costco."
+
+- **AI-Powered Organization**
+  - Automatically extracts text from screenshots and categorizes them based on their content.
+
+- **Smart Categories**
+  - Organizes screenshots into categories such as recipes, travel, shopping, receipts, notes, quotes, events, social media, and more.
+
+- **Responsive Interface**
+  - A clean, modern interface designed for fast browsing and effortless searching across devices.
+
+- **Secure Authentication**
+  - User accounts ensure screenshots remain private and accessible only to their owner.
+
+---
+
+## How It Works
+
+1. Upload your screenshots.
+2. Cache extracts text and analyzes the content.
+3. Screenshots are automatically categorized and indexed.
+4. Search using natural language to instantly find what you're looking for.
+
+---
+
+## Tech Stack
+
+- Next.js
+- TypeScript
+- Tailwind CSS
+- Supabase
+- AI-powered OCR and semantic search
+
+---
 
 ## Getting Started
 
-First, run the development server:
+Clone the repository:
+
+```bash
+git clone https://github.com/aarohigandhi/cache.git
+cd cache
+```
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Create a `.env.local` file using the provided `.env.example`.
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Vision
 
-## Learn More
+People save screenshots because they don't want to lose information, but finding that information later is often frustrating. Cache transforms your screenshot collection into a searchable knowledge base by combining AI-powered understanding with an intuitive interface.
 
-To learn more about Next.js, take a look at the following resources:
+Instead of remembering when you saved something, you only need to remember what it was.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Contributors
 
-## Deploy on Vercel
+### Varnika Dokka
+- Led frontend development and user experience improvements
+- Implemented authentication, onboarding, and search functionality
+- Built and refined the interface, responsive layouts, and deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Aarohi Gandhi
+- Designed the backend architecture and data organization
+- Developed the AI-powered screenshot processing pipeline
+- Integrated screenshot analysis and automatic categorization

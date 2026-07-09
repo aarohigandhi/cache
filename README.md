@@ -47,7 +47,7 @@ Next.js and Tailwind on Vercel, with Supabase handling auth, file storage, and a
 ## Run it locally
 
 ```bash
-git clone https://github.com/aarohigandhi/cache.git
+git clone https://github.com/cache-app1/cache.git
 cd cache
 npm install
 ```

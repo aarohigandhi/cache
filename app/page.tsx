@@ -11,6 +11,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { normalizeCategory, getTopTags } from "@/lib/categories";
+import { track } from "@/lib/analytics";
 import type { Session } from "@supabase/supabase-js";
 
 const ONBOARDING_KEY = "cache_onboarded";
@@ -89,6 +90,7 @@ function CacheApp({ session }: { session: Session }) {
 
     setUploading(false);
     dismissOnboarding();
+    track("upload", { count: fileArray.length });
   }
 
   async function handleDelete(id: string) {
@@ -124,6 +126,7 @@ function CacheApp({ session }: { session: Session }) {
       }
       const results = await res.json();
       setSearchResults(Array.isArray(results) ? results : []);
+      track("search", { query });
     } catch {
       setSearchError("Search failed. Try again.");
       setSearchResults(null);

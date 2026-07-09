@@ -98,6 +98,6 @@ Instead of remembering when you saved something, you only need to remember what 
 - Designed and refined the interface, responsive layouts, and deployment
 
 ### Aarohi Gandhi
-- Designed the backend development/architecture and data organization
-- Developed the AI-powered screenshot processing pipeline
+- Led backend development/architecture and data organization
+- Developed the AI-powered screenshot processing pipeline and metadata extraction
 - Integrated screenshot analysis and automatic categorization

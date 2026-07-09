@@ -6,6 +6,8 @@ Cache is an AI-powered screenshot manager that transforms your camera roll into 
 
 Whether it's a recipe you saved weeks ago, a travel itinerary, a receipt, a note, or an outfit inspiration post, Cache makes your screenshots easy to organize and even easier to find.
 
+**Live Demo:** https://cache-cacheshots.vercel.app
+
 ## Demo
 
 <p align="center">
